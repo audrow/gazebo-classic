@@ -1367,11 +1367,18 @@ void Camera::ShowWireframe(const bool s)
 //////////////////////////////////////////////////
 void Camera::CameraToViewportRay(const int _screenx, const int _screeny,
     ignition::math::Vector3d &_origin,
-    ignition::math::Vector3d &_dir) const
+    ignition::math::Vector3d &_dir,
+    bool isLog) const
 {
   Ogre::Ray ray = this->camera->getCameraToViewportRay(
       static_cast<float>(_screenx) / this->ViewportWidth(),
       static_cast<float>(_screeny) / this->ViewportHeight());
+
+  if (isLog){
+    gzwarn << "Viewport: " << this->ViewportWidth() << " " << this->ViewportHeight() << "\n";
+    gzwarn << "CameraToViewportRay: " << ray.getOrigin() << " "
+          << ray.getDirection() << std::endl;
+  }
 
   _origin.Set(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
   _dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);

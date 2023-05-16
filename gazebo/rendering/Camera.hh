@@ -573,7 +573,8 @@ namespace gazebo
       public: virtual void CameraToViewportRay(const int _screenx,
                   const int _screeny,
                   ignition::math::Vector3d &_origin,
-                  ignition::math::Vector3d &_dir) const;
+                  ignition::math::Vector3d &_dir,
+                  bool isLog = false) const;
 
       /// \brief Set the camera's render target
       /// \param[in] _target Pointer to the render target

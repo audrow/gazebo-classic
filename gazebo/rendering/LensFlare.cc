@@ -276,7 +276,6 @@ namespace gazebo
         // loop through all env cameras
         for (auto cam : ogreEnvCameras)
         {
-          gzwarn << "****************************\n";
           // project light world point to camera clip space.
           auto viewProj = cam->getProjectionMatrix() * cam->getViewMatrix();
           auto pos = viewProj *
@@ -305,8 +304,6 @@ namespace gazebo
 
             // check occlusion using this env camera
             auto camPos = cam->getDerivedPosition();
-            gzwarn << "Checking occlusion with camera at: "
-                   << camPos.x << ", " << camPos.y << ", " << camPos.z << "\n";
             this->dataPtr->wideAngleDummyCamera->SetWorldPose(
                 ignition::math::Pose3d(
                   Conversions::ConvertIgn(cam->getDerivedPosition()),
@@ -348,13 +345,14 @@ namespace gazebo
       // if occluded than set scale to 0
       ignition::math::Vector3d position;
       bool intersect = scene->FirstContact(_cam, screenPos, position, true);
+      gzwarn << "****************************\n";
       gzwarn << "FirstContact: " << intersect << "\n";
-      gzwarn << "Position: " << position.X() << ", " << position.Y() << ", " << position.Z() << "\n";
+      // gzwarn << "Position: " << position.X() << ", " << position.Y() << ", " << position.Z() << "\n";
       auto cameraPos = _cam->WorldPosition();
       gzwarn << "Checking Wide Angle camera in Occlusion Scale: "
               << cameraPos.X() << ", " << cameraPos.Y() << ", " << cameraPos.Z() << "\n";
       // ScreenPos doesn't seem to change
-      gzwarn << "ScreenPos: " << screenPos.X() << ", " << screenPos.Y() << "\n";
+      // gzwarn << "ScreenPos: " << screenPos.X() << ", " << screenPos.Y() << "\n";
       if (intersect && (position.Length() < _worldPos.Length()))
         return 0;
 
