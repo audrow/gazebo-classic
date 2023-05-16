@@ -258,6 +258,7 @@ namespace gazebo
       GZ_ASSERT(viewportWidth > 0, "Viewport width is 0");
       GZ_ASSERT(viewportHeight > 0, "Viewport height is 0");
 
+      // gzwarn << "imagePos: " << imagePos.X() << " " << imagePos.Y() << " " << imagePos.Z() << "\n";
       // convert to normalized device coordinates (needed by shaders)
       // keep z for visibility test
       lightPos.x = 2.0 * (imagePos.X() / viewportWidth  - 0.5);
@@ -275,12 +276,14 @@ namespace gazebo
         // loop through all env cameras
         for (auto cam : ogreEnvCameras)
         {
+          gzwarn << "****************************\n";
           // project light world point to camera clip space.
           auto viewProj = cam->getProjectionMatrix() * cam->getViewMatrix();
           auto pos = viewProj *
               Ogre::Vector4(Conversions::Convert(this->dataPtr->lightWorldPos));
           pos.x /= pos.w;
           pos.y /= pos.w;
+
           // check if light is visible
           if (std::fabs(pos.x) <= 1 &&
               std::fabs(pos.y) <= 1 && pos.z > -abs(pos.w))
@@ -301,6 +304,9 @@ namespace gazebo
             quat = rotquat * quat;
 
             // check occlusion using this env camera
+            auto camPos = cam->getDerivedPosition();
+            gzwarn << "Checking occlusion with camera at: "
+                   << camPos.x << ", " << camPos.y << ", " << camPos.z << "\n";
             this->dataPtr->wideAngleDummyCamera->SetWorldPose(
                 ignition::math::Pose3d(
                   Conversions::ConvertIgn(cam->getDerivedPosition()),
@@ -341,7 +347,14 @@ namespace gazebo
       // check center point
       // if occluded than set scale to 0
       ignition::math::Vector3d position;
-      bool intersect = scene->FirstContact(_cam, screenPos, position);
+      bool intersect = scene->FirstContact(_cam, screenPos, position, true);
+      gzwarn << "FirstContact: " << intersect << "\n";
+      gzwarn << "Position: " << position.X() << ", " << position.Y() << ", " << position.Z() << "\n";
+      auto cameraPos = _cam->WorldPosition();
+      gzwarn << "Checking Wide Angle camera in Occlusion Scale: "
+              << cameraPos.X() << ", " << cameraPos.Y() << ", " << cameraPos.Z() << "\n";
+      // ScreenPos doesn't seem to change
+      gzwarn << "ScreenPos: " << screenPos.X() << ", " << screenPos.Y() << "\n";
       if (intersect && (position.Length() < _worldPos.Length()))
         return 0;
 

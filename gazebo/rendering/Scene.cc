@@ -1207,7 +1207,8 @@ Ogre::Entity *Scene::OgreEntityAt(CameraPtr _camera,
 //////////////////////////////////////////////////
 bool Scene::FirstContact(CameraPtr _camera,
                          const ignition::math::Vector2i &_mousePos,
-                         ignition::math::Vector3d &_position)
+                         ignition::math::Vector3d &_position,
+                         bool isLog)
 {
   _position = ignition::math::Vector3d::Zero;
 
@@ -1216,12 +1217,18 @@ bool Scene::FirstContact(CameraPtr _camera,
   ignition::math::Vector3d origin, dir;
   _camera->CameraToViewportRay(
       _mousePos.X(), _mousePos.Y(), origin, dir);
+  if (isLog){
+    gzwarn << "origin: " << origin.X() << " " << origin.Y() << " " << origin.Z() << "\n";
+    gzwarn << "dir: " << dir.X() << " " << dir.Y() << " " << dir.Z() << "\n";
+  }
   Ogre::Ray mouseRay(Conversions::Convert(origin),
       Conversions::Convert(dir));
 
   UserCameraPtr userCam = boost::dynamic_pointer_cast<UserCamera>(_camera);
   if (userCam)
   {
+    if (isLog)
+      gzwarn << "UserCamera was found\n";
     VisualPtr vis = userCam->Visual(_mousePos);
     if (vis)
     {
@@ -1234,13 +1241,15 @@ bool Scene::FirstContact(CameraPtr _camera,
           intersect);
     }
   }
-  else
+  else // THIS IS THE BLOCK THAT IS RUN
   {
+    if (isLog)
+      gzwarn << "NO UserCamera was found\n";
     this->dataPtr->raySceneQuery->setSortByDistance(true);
     this->dataPtr->raySceneQuery->setRay(mouseRay);
 
     // Perform the scene query
-    Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
+    Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute(); // Steve thinks this is the most interesting line
     Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
 
@@ -1294,7 +1303,7 @@ bool Scene::FirstContact(CameraPtr _camera,
   }
 
   // Check intersection with the terrain
-  if (this->dataPtr->terrain)
+  if (this->dataPtr->terrain) // THIS IS NOT RUN
   {
     // The terrain uses a special ray intersection test.
     Ogre::TerrainGroup::RayResult terrainResult =
@@ -1302,6 +1311,8 @@ bool Scene::FirstContact(CameraPtr _camera,
 
     if (terrainResult.hit)
     {
+      if (isLog)
+        gzwarn << "Terrain was hit\n";
       double terrainHitDist =
           mouseRay.getOrigin().distance(terrainResult.position);
 
@@ -1316,8 +1327,10 @@ bool Scene::FirstContact(CameraPtr _camera,
 
   // if no terrain intersection, return position of intersection point with
   // closest entity
-  if (distance > 0.0)
+  if (distance > 0.0) // THIS IS ALSO RUN
   {
+    if (isLog)
+      gzwarn << "No terrain was intersection\n";
     _position = Conversions::ConvertIgn(mouseRay.getPoint(distance));
     return true;
   }

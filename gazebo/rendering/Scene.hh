@@ -362,7 +362,8 @@ namespace gazebo
       /// \return True if a valid object was hit by the raycast.
       public: bool FirstContact(CameraPtr _camera,
                                 const ignition::math::Vector2i &_mousePos,
-                                ignition::math::Vector3d &_position);
+                                ignition::math::Vector3d &_position,
+                                bool isLog = false);
 
       /// \brief Print the scene graph to std_out.
       public: void PrintSceneGraph();
