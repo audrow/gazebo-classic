@@ -1375,8 +1375,9 @@ void Camera::CameraToViewportRay(const int _screenx, const int _screeny,
       static_cast<float>(_screeny) / this->ViewportHeight());
 
   if (isLog){
-    gzwarn << "Viewport: " << this->ViewportWidth() << " " << this->ViewportHeight() << "\n";
-    gzwarn << "CameraToViewportRay: " << ray.getOrigin() << " "
+    gzwarn << "Input:  Screen:   " << _screenx << ", " << _screeny << "\n";
+    gzwarn << "Input:  Viewport: " << this->ViewportWidth() << " " << this->ViewportHeight() << "\n";
+    gzwarn << "Output: CameraToViewportRay: " << ray.getOrigin() << " "
           << ray.getDirection() << std::endl;
   }
 

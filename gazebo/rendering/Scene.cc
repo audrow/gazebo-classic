@@ -1219,8 +1219,8 @@ bool Scene::FirstContact(CameraPtr _camera,
       _mousePos.X(), _mousePos.Y(), origin, dir, isLog);
   if (isLog){
     // gzwarn << "screenXY: " << _mousePos.X() << ", " << _mousePos.Y() << "\n";// doesn't change
-    gzwarn << "origin: " << origin.X() << ", " << origin.Y() << ", " << origin.Z() << "\n";
-    gzwarn << "dir: " << dir.X() << ", " << dir.Y() << ", " << dir.Z() << "\n";
+    // gzwarn << "origin: " << origin.X() << ", " << origin.Y() << ", " << origin.Z() << "\n";
+    // gzwarn << "dir: " << dir.X() << ", " << dir.Y() << ", " << dir.Z() << "\n";
   }
   Ogre::Ray mouseRay(Conversions::Convert(origin),
       Conversions::Convert(dir));
