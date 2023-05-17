@@ -344,10 +344,10 @@ namespace gazebo
       // check center point
       // if occluded than set scale to 0
       ignition::math::Vector3d position;
-      bool intersect = scene->FirstContact(_cam, screenPos, position, true);
       gzwarn << "****************************\n";
-      gzwarn << "FirstContact: " << intersect << "\n";
-      // gzwarn << "Position: " << position.X() << ", " << position.Y() << ", " << position.Z() << "\n";
+      bool intersect = scene->FirstContact(_cam, screenPos, position, true);
+      gzwarn << "Returned FirstContact: " << intersect << "\n";
+      gzwarn << "Returned Position: " << position << "\n";
       auto cameraPos = _cam->WorldPosition();
       gzwarn << "Checking Wide Angle camera in Occlusion Scale: "
               << cameraPos.X() << ", " << cameraPos.Y() << ", " << cameraPos.Z() << "\n";

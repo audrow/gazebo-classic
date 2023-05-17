@@ -1214,13 +1214,16 @@ bool Scene::FirstContact(CameraPtr _camera,
 
   double distance = -1.0;
 
+  if (isLog){
+    gzwarn << "Camera pose: " << _camera->WorldPose() << "\n";
+  }
   ignition::math::Vector3d origin, dir;
   _camera->CameraToViewportRay(
       _mousePos.X(), _mousePos.Y(), origin, dir, isLog);
   if (isLog){
-    // gzwarn << "screenXY: " << _mousePos.X() << ", " << _mousePos.Y() << "\n";// doesn't change
-    // gzwarn << "origin: " << origin.X() << ", " << origin.Y() << ", " << origin.Z() << "\n";
-    // gzwarn << "dir: " << dir.X() << ", " << dir.Y() << ", " << dir.Z() << "\n";
+    gzwarn << "screenXY: " << _mousePos.X() << ", " << _mousePos.Y() << "\n";// doesn't change
+    gzwarn << "origin: " << origin.X() << ", " << origin.Y() << ", " << origin.Z() << "\n";
+    gzwarn << "dir: " << dir.X() << ", " << dir.Y() << ", " << dir.Z() << "\n";
   }
   Ogre::Ray mouseRay(Conversions::Convert(origin),
       Conversions::Convert(dir));
@@ -1251,6 +1254,9 @@ bool Scene::FirstContact(CameraPtr _camera,
 
     // Perform the scene query
     Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute(); // Steve thinks this is the most interesting line
+    if (isLog){
+      gzwarn << "result.size(): " << result.size() << "\n";
+    }
     Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
 
@@ -1258,8 +1264,12 @@ bool Scene::FirstContact(CameraPtr _camera,
     for (; iter != result.end() && distance <= 0.0; ++iter)
     {
       // Skip results where the distance is zero or less
-      if (iter->distance <= 0.0)
+      if (iter->distance <= 0.0){
+        if (false) { // this happens often
+          gzwarn << "iter->distance <= 0.0\n";
+        }
         continue;
+      }
 
       unsigned int flags = iter->movable->getVisibilityFlags();
 
@@ -1271,6 +1281,9 @@ bool Scene::FirstContact(CameraPtr _camera,
           iter->movable->getMovableType().compare("Entity") == 0 &&
           !(flags != GZ_VISIBILITY_ALL && guiOrSelectable))
       {
+        if (isLog){
+          // gzwarn << "There's a hit\n";
+        }
         Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
         VisualPtr vis;
@@ -1286,9 +1299,10 @@ bool Scene::FirstContact(CameraPtr _camera,
             gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
             continue;
           }
-          if (!vis)
+          if (!vis){
+            gzwarn << "Unable to find visual\n";
             continue;
-
+          }
           RayQuery rayQuery(_camera);
           ignition::math::Vector3d intersect;
           ignition::math::Triangle3d triangle;
@@ -1312,8 +1326,9 @@ bool Scene::FirstContact(CameraPtr _camera,
 
     if (terrainResult.hit)
     {
-      if (isLog)
-        gzwarn << "Terrain was hit\n";
+      if (isLog){
+        gzwarn << "terrainResult.position: " << terrainResult.position << "\n";
+      }
       double terrainHitDist =
           mouseRay.getOrigin().distance(terrainResult.position);
 
@@ -1326,13 +1341,18 @@ bool Scene::FirstContact(CameraPtr _camera,
     }
   }
 
+  if (isLog){
+    gzwarn << "distance: " << distance << "\n";
+  }
+
   // if no terrain intersection, return position of intersection point with
   // closest entity
   if (distance > 0.0) // THIS IS ALSO RUN
   {
-    if (isLog)
-      gzwarn << "No terrain was intersection\n";
     _position = Conversions::ConvertIgn(mouseRay.getPoint(distance));
+    if (isLog){
+      gzwarn << "No terrain was intersection\n";
+    }
     return true;
   }
 
